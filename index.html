@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Starfield Animation</title>
+    <style>
+        body, html {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            height: 100%;
+            width: 100%;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        const numStars = 1000;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function createStar() {
+            const speed = Math.random() * 10 + 0.01; // Varying speed
+            return {
+                x: (Math.random() - 0.5) * canvas.width,
+                y: (Math.random() - 0.5) * canvas.height,
+                z: Math.random() * canvas.width,
+                speed: speed,
+                color: `rgb(${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())}, 255)` // Varying color
+            };
+        }
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push(createStar());
+            }
+        }
+
+        function updateStars() {
+            for (let i = 0; i < numStars; i++) {
+                const star = stars[i];
+                star.z -= star.speed;
+                if (star.z <= 0) {
+                    stars[i] = createStar();
+                    stars[i].z = canvas.width;
+                }
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < numStars; i++) {
+                const star = stars[i];
+                const k = 128.0 / star.z;
+                const x = star.x * k + canvas.width / 2;
+                const y = star.y * k + canvas.height / 2;
+                const size = (1 - star.z / canvas.width) * 1;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fillStyle = star.color;
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            updateStars();
+            drawStars();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initStars();
+        });
+
+        resizeCanvas();
+        initStars();
+        animate();
+    </script>
+</body>
+</html>
